@@ -17,8 +17,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	statusSvr := status.NewServer()
-	go statusSvr.Start(":4040")
+	if conf.Status {
+		statusSvr := status.NewServer()
+		go statusSvr.Start(":4040")
+	}
 
 	svr := server.NewServer(conf)
 	go svr.Listen()

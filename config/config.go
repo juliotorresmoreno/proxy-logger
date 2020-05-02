@@ -11,6 +11,7 @@ type Config struct {
 	Addr      string
 	Hosts     []string
 	ProxyHTTP string `yaml:"proxy_http"`
+	Status    bool   `yaml:"status"`
 }
 
 func GetConfig() (Config, error) {
