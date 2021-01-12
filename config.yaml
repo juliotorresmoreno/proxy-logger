@@ -1,7 +1,0 @@
-
-addr: :5000
-algorithm: random
-hosts:
-  - http://localhost:8000
-proxy_http: http://192.168.43.1:8080
-status: true
