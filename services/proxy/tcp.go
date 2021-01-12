@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net"
 )
 
@@ -23,7 +22,6 @@ func (p *Proxy) handleTCP(conn net.Conn, buffer []byte) bool {
 			p.adminServer.closeConnection <- connection
 		}()
 	}
-	ioutil.ReadAll(conn)
 	fmt.Println(content)
 	return true
 }

@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"net"
-	"strings"
 )
 
 // Proxy Componente encargado de servir de proxy
@@ -53,14 +52,13 @@ func (p *Proxy) dispatch(conn net.Conn) {
 		p.handleTCP,
 	}
 	for {
-		tmp := make([]byte, 1024*64)
-		_, err := conn.Read(tmp)
+		upgrade := make([]byte, 1024*64)
+		n, err := conn.Read(upgrade)
 		if err != nil {
 			continue
 		}
-		buffer := []byte(strings.Trim(string(tmp), string([]byte{0})))
 		for _, handler := range handlers {
-			if handler(conn, buffer) {
+			if handler(conn, upgrade[:n]) {
 				break
 			}
 		}
