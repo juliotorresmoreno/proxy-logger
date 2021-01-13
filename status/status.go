@@ -106,14 +106,14 @@ func Append(request *Request) {
 }
 
 func read() {
-	f, err := os.Open("/tmp/requests.json")
+	f, err := os.Open("requests.json")
 	if err == nil {
 		json.NewDecoder(f).Decode(&requests)
 	}
 }
 
 func save() {
-	f, err := os.OpenFile("/tmp/requests.json", os.O_CREATE|os.O_WRONLY, 0666)
+	f, err := os.OpenFile("requests.json", os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		return
 	}

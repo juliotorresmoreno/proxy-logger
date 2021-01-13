@@ -62,12 +62,12 @@ func pipe(src, dst *validConn) {
 		recover()
 		src.Close()
 	}()
-	b := make([]byte, 1024*16)
 	for {
 		if !src.status {
 			break
 		}
 		src.SetReadDeadline(time.Now().Add(time.Second * 30))
+		b := make([]byte, 1024*16)
 		n, err := src.Read(b)
 		if err == io.EOF {
 			dst.status = false
