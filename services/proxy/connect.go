@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"time"
 )
 
@@ -15,29 +14,43 @@ func isCONNECT(content string) bool {
 	return false
 }
 
-func (p *Proxy) handleCONNECT(conn net.Conn, upgrade []byte) bool {
+func (p *Proxy) handleCONNECT(vConn *validConn, upgrade []byte) bool {
+	var err error
 	content := string(upgrade)
 	if !isCONNECT(content) {
 		return false
 	}
-	proxyConn, err := net.DialTimeout("tcp", "192.168.43.1:8080", time.Second)
+	proxyConn, err := net.DialTimeout("tcp", "127.0.0.1:6000", time.Second)
 	if err != nil {
 		log.Println(err.Error())
-		fmt.Fprint(conn, "HTTP/1.1 500 Internal server error\r\n")
-		fmt.Fprint(conn, "Content-Type: text/plain\r\n")
-		fmt.Fprint(conn, "Connection: close\r\n")
-		fmt.Fprint(conn, "\r\n")
-		fmt.Fprint(conn, err.Error())
-		fmt.Fprint(conn, "\r\n")
-		conn.Close()
+		fmt.Fprint(vConn, "HTTP/1.1 500 Internal server error\r\n")
+		fmt.Fprint(vConn, "Content-Type: text/plain\r\n")
+		fmt.Fprint(vConn, "Connection: close\r\n")
+		fmt.Fprint(vConn, "\r\n")
+		fmt.Fprint(vConn, err.Error())
+		fmt.Fprint(vConn, "\r\n")
+		vConn.Close()
 		return true
 	}
-	vProxyConn := &validConn{proxyConn, true}
-	vConn := &validConn{conn, true}
-	go pipe(vConn, vProxyConn)
-	go pipe(vProxyConn, vConn)
-	proxyConn.Write(upgrade)
+	vProxyConn := &validConn{"proxy", proxyConn, true}
 
-	os.Stdout.Write(upgrade)
+	/*fmt.Fprint(vConn, "HTTP/1.1 200 Connection established\r\n",
+		"Connection: keep-alive\r\n",
+		"Via: 1.1 localhost\r\n\r\n")
+	go func() {
+		body := make([]byte, 1024*64)
+		n, _ := vConn.Read(body)
+		body = body[:n]
+		os.Stdout.Write(body)
+	}()*/
+
+	go pipe(vProxyConn, vConn)
+	go pipe(vConn, vProxyConn)
+	_, err = proxyConn.Write(upgrade)
+	if err != nil {
+		vConn.Close()
+		vProxyConn.Close()
+		fmt.Println(err.Error())
+	}
 	return true
 }

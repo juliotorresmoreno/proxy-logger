@@ -50,7 +50,7 @@ func getHost(upgrade string) string {
 	return ""
 }
 
-func (p *Proxy) handleHTTP(conn net.Conn, upgrade []byte) bool {
+func (p *Proxy) handleHTTP(conn *validConn, upgrade []byte) bool {
 	content := string(upgrade)
 	if !isHTTP(content) {
 		return false
@@ -69,8 +69,8 @@ func (p *Proxy) handleHTTP(conn net.Conn, upgrade []byte) bool {
 		conn.Close()
 		return true
 	}
-	vServerConn := &validConn{serverConn, true}
-	vConn := &validConn{conn, true}
+	vServerConn := &validConn{"", serverConn, true}
+	vConn := &validConn{"", conn, true}
 	go pipe(vConn, vServerConn)
 	go pipe(vServerConn, vConn)
 	serverConn.Write(upgrade)

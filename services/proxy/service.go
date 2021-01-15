@@ -46,7 +46,7 @@ func (p *Proxy) ListenWithAdmin() error {
 }
 
 func (p *Proxy) dispatch(conn net.Conn) {
-	handlers := []func(net.Conn, []byte) bool{
+	handlers := []func(*validConn, []byte) bool{
 		p.handleHTTP,
 		p.handleCONNECT,
 		p.handleTCP,
@@ -57,8 +57,10 @@ func (p *Proxy) dispatch(conn net.Conn) {
 		if err != nil {
 			continue
 		}
+
 		for _, handler := range handlers {
-			if handler(conn, upgrade[:n]) {
+			vConn := &validConn{"connection", conn, true}
+			if handler(vConn, upgrade[:n]) {
 				break
 			}
 		}

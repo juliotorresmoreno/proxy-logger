@@ -2,14 +2,13 @@ package proxy
 
 import (
 	"fmt"
-	"net"
 )
 
 func isTCP(content string) bool {
 	return !isHTTP(content) && !isCONNECT(content)
 }
 
-func (p *Proxy) handleTCP(conn net.Conn, buffer []byte) bool {
+func (p *Proxy) handleTCP(conn *validConn, buffer []byte) bool {
 	content := string(buffer)
 	if !isHTTP(content) {
 		return false
