@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strings"
 	"time"
 )
@@ -50,31 +49,29 @@ func getHost(upgrade string) string {
 	return ""
 }
 
-func (p *Proxy) handleHTTP(conn *validConn, upgrade []byte) bool {
+func (p *Proxy) handleHTTP(vConn *validConn, upgrade []byte) bool {
 	content := string(upgrade)
 	if !isHTTP(content) {
 		return false
 	}
 
 	host := getHost(content)
+	//host := getProxyHost()
 	serverConn, err := net.DialTimeout("tcp", host, 5*time.Second)
 	if err != nil {
 		log.Println(err.Error())
-		fmt.Fprint(conn, "HTTP/1.1 500 Internal server error\r\n")
-		fmt.Fprint(conn, "Content-Type: text/plain\r\n")
-		fmt.Fprint(conn, "Connection: close\r\n")
-		fmt.Fprint(conn, "\r\n")
-		fmt.Fprint(conn, err.Error())
-		fmt.Fprint(conn, "\r\n")
-		conn.Close()
+		fmt.Fprint(vConn, "HTTP/1.1 500 Internal server error\r\n")
+		fmt.Fprint(vConn, "Content-Type: text/plain\r\n")
+		fmt.Fprint(vConn, "Connection: close\r\n")
+		fmt.Fprint(vConn, "\r\n")
+		fmt.Fprint(vConn, err.Error())
+		fmt.Fprint(vConn, "\r\n")
+		vConn.Close()
 		return true
 	}
-	vServerConn := &validConn{"", serverConn, true}
-	vConn := &validConn{"", conn, true}
+	vServerConn := &validConn{"server", serverConn, true}
 	go pipe(vConn, vServerConn)
 	go pipe(vServerConn, vConn)
-	serverConn.Write(upgrade)
-
-	os.Stdout.Write(upgrade)
+	vServerConn.Write(upgrade)
 	return true
 }
