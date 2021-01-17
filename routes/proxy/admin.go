@@ -3,6 +3,7 @@ package proxy
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -49,18 +50,30 @@ func (w *HTTPWriter) getContenFromRequest() string {
 	req := w.request
 	content := fmt.Sprintf("%v %v://%v %v", req.Method, w.protocol, req.Host, req.Proto)
 	for header := range req.Header {
+		if header == "Authorization" {
+			continue
+		}
+		if header == "Proxy-Authorization" {
+			continue
+		}
 		content += fmt.Sprintf("\r\n%v: %v", header, req.Header.Get(header))
 	}
 	content += fmt.Sprint("\r\n")
 	return content
 }
 
-//Register .
-func (w *HTTPWriter) Register() {
-	content := w.getContenFromRequest()
-	fmt.Println(content)
+var out io.Writer
+
+// SetLoggerWriter .
+func SetLoggerWriter(w io.Writer) {
+	out = w
 }
 
-func registerEvent(w http.ResponseWriter, r *http.Request) *HTTPWriter {
-	return NewHTTPWriter(w, r)
+//Register .
+func (w *HTTPWriter) Register() {
+	if out == nil {
+		return
+	}
+	content := w.getContenFromRequest()
+	fmt.Fprintln(out, content)
 }

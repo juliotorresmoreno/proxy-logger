@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/juliotorresmoreno/proxy-logger/config"
 	"github.com/juliotorresmoreno/proxy-logger/routes/proxy"
@@ -24,6 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	proxy.SetLoggerWriter(os.Stdout)
 	server := &http.Server{
 		Addr:    config.Addr,
 		Handler: proxy.NewRouter(),

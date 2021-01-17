@@ -9,6 +9,7 @@ import (
 	"github.com/juliotorresmoreno/proxy-logger/services/auth"
 )
 
+// BasicAuth .
 func BasicAuth(credentials string) error {
 	decoded, err := base64.StdEncoding.DecodeString(credentials)
 	if err != nil {
@@ -46,7 +47,7 @@ func NewRouter() http.HandlerFunc {
 			w.Write([]byte("Unauthorized"))
 			return
 		}
-		httpWriter := registerEvent(w, r)
+		httpWriter := NewHTTPWriter(w, r)
 		if r.Method == http.MethodConnect {
 			handleTunneling(w, r)
 			httpWriter.protocol = "https"
