@@ -1,30 +1,38 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
+	"net/http"
+	"os"
 
 	"github.com/juliotorresmoreno/proxy-logger/config"
-	"github.com/juliotorresmoreno/proxy-logger/server"
-	"github.com/juliotorresmoreno/proxy-logger/status"
+	"github.com/juliotorresmoreno/proxy-logger/routes/proxy"
 )
 
 func main() {
-	loop := make(chan bool)
-
-	log.SetFlags(log.Lshortfile | log.Ltime | log.LstdFlags)
-	conf, err := config.GetConfig()
+	var pemPath string
+	flag.StringVar(&pemPath, "pem", "server.pem", "path to pem file")
+	var keyPath string
+	flag.StringVar(&keyPath, "key", "server.key", "path to key file")
+	var proto string
+	flag.StringVar(&proto, "proto", "http", "Proxy protocol (http or https)")
+	flag.Parse()
+	if proto != "http" && proto != "https" {
+		log.Fatal("Protocol must be either http or https")
+	}
+	config, err := config.GetConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
-	if conf.Status {
-		statusSvr := status.NewServer()
-		go statusSvr.Start(":4040")
+	proxy.SetLoggerWriter(os.Stdout)
+	server := &http.Server{
+		Addr:    config.Addr,
+		Handler: proxy.NewRouter(),
 	}
-
-	svr := server.NewServer(conf)
-	go svr.Listen()
-	fmt.Printf("Listening server on %v\n", conf.Addr)
-
-	<-loop
+	if proto == "http" {
+		log.Fatal(server.ListenAndServe())
+	} else {
+		log.Fatal(server.ListenAndServeTLS(pemPath, keyPath))
+	}
 }
