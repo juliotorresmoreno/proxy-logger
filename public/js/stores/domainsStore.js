@@ -1,5 +1,5 @@
 /**
- * @typedef {import('./historyStore').DomainsStore} DomainsStore
+ * @typedef {import('./domainsStore').DomainsStore} DomainsStore
  */
 
 /**

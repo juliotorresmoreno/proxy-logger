@@ -2,7 +2,11 @@
 (function () {
     Vue.component('Auth', {
         template: `
-            <div>auth</div>
+            <form>
+                <div>
+                    <input type='text' />
+                </div>
+            </form>
         `
-    })
-})()
+    });
+})();

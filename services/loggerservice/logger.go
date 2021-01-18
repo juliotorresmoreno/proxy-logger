@@ -27,6 +27,7 @@ func NewHTTPWriter(w http.ResponseWriter, r *http.Request) *HTTPWriter {
 	c.responseWriter = w
 	c.request = r
 	c.buffer = bytes.NewBufferString("")
+	c.StatusCode = 200
 	return c
 }
 
