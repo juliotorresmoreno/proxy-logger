@@ -8,7 +8,9 @@
         window.app = new Vue({
             el: '#app',
             template: '<App />',
-            data: () => appStore.data,
+            data: () => ({
+                appStore: appStore.data
+            }),
             mounted() {
                 const minPath = (location.protocol + '//' + location.host).length;
                 appStore.setState({
@@ -30,9 +32,6 @@
                         });
                     }
                 });
-            },
-            updated() {
-                console.log(this.$data.route);
             }
         });
     });
