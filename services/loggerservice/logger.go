@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 //HTTPWriter .
@@ -49,14 +50,16 @@ func (w *HTTPWriter) WriteHeader(statusCode int) {
 func (w *HTTPWriter) getContenFromRequest() string {
 	req := w.request
 	content := fmt.Sprintf("%v %v://%v %v", req.Method, w.Protocol, req.Host, req.Proto)
-	for header := range req.Header {
-		if header == "Authorization" {
-			continue
+	if os.Getenv("ENVIRONMENT") == "development" {
+		for header := range req.Header {
+			if header == "Authorization" {
+				continue
+			}
+			if header == "Proxy-Authorization" {
+				continue
+			}
+			content += fmt.Sprintf("\r\n%v: %v", header, req.Header.Get(header))
 		}
-		if header == "Proxy-Authorization" {
-			continue
-		}
-		content += fmt.Sprintf("\r\n%v: %v", header, req.Header.Get(header))
 	}
 	content += fmt.Sprint("\r\n")
 	return content
@@ -75,5 +78,5 @@ func (w *HTTPWriter) Register() {
 		return
 	}
 	content := w.getContenFromRequest()
-	fmt.Fprintln(out, content)
+	fmt.Fprint(out, content)
 }
