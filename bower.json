@@ -1,0 +1,24 @@
+{
+  "name": "proxy-logger",
+  "homepage": "https://github.com/juliotorresmoreno/proxy-logger",
+  "authors": [
+    "Julio Torres <jtorres990@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^4.5.3",
+    "moment": "^2.29.1",
+    "vue": "^2.6.12",
+    "jquery": "^3.5.1",
+    "vue-router": "^3.4.9"
+  }
+}

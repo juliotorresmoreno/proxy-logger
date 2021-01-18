@@ -4,3 +4,5 @@ credentials:
   - username: admin
     password: 07863e7a6a2154ba864a71b0818c5ed32f78999430254b2e272d461fcd0d34eb
 addr: :5000
+admin:
+  addr: :8080
