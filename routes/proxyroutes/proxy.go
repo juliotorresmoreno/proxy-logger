@@ -1,4 +1,4 @@
-package proxy
+package proxyroutes
 
 import (
 	"encoding/base64"
@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/juliotorresmoreno/proxy-logger/services/auth"
+	"github.com/juliotorresmoreno/proxy-logger/services/authservice"
+	"github.com/juliotorresmoreno/proxy-logger/services/loggerservice"
 )
 
 // BasicAuth .
@@ -18,11 +19,11 @@ func BasicAuth(credentials string) error {
 	splitData := strings.Split(string(decoded), ":")
 	username := splitData[0]
 	password := splitData[1]
-	u := &auth.User{
+	u := &authservice.User{
 		Username: username,
 		Password: password,
 	}
-	if ok, _ := auth.SignIn(u); !ok {
+	if ok, _ := authservice.SignIn(u); !ok {
 		return errors.New("Unauthorized")
 	}
 	return nil
@@ -47,14 +48,14 @@ func NewRouter() http.HandlerFunc {
 			w.Write([]byte("Unauthorized"))
 			return
 		}
-		httpWriter := NewHTTPWriter(w, r)
+		httpWriter := loggerservice.NewHTTPWriter(w, r)
 		if r.Method == http.MethodConnect {
 			handleTunneling(w, r)
-			httpWriter.protocol = "https"
+			httpWriter.Protocol = "https"
 			httpWriter.Register()
 		} else {
 			handleHTTP(httpWriter, r)
-			httpWriter.protocol = "http"
+			httpWriter.Protocol = "http"
 			httpWriter.Register()
 		}
 	}

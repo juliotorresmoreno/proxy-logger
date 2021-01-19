@@ -15,11 +15,17 @@ type Credentials struct {
 	Password string `yaml:"password"`
 }
 
+// Admin .
+type Admin struct {
+	Addr string `yaml:"addr"`
+}
+
 // Config .
 type Config struct {
 	Addr        string        `yaml:"addr"`
 	RedisURL    string        `yaml:"redis_url"`
 	Credentials []Credentials `yaml:"credentials"`
+	Admin       Admin         `yaml:"admin"`
 	credentials map[string]Credentials
 }
 

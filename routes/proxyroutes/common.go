@@ -1,4 +1,4 @@
-package proxy
+package proxyroutes
 
 import (
 	"io"
@@ -12,7 +12,7 @@ type conn struct {
 }
 
 func (el conn) Write(b []byte) (int, error) {
-	if os.Getenv("ENVIROMENT") == "development" {
+	if os.Getenv("ENVIRONMENT") == "development" {
 		os.Stdout.Write(b)
 		os.Stdout.Write([]byte("\n\n"))
 	}

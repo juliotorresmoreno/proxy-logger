@@ -1,5 +1,9 @@
 {
   "name": "proxy-logger",
+<<<<<<< HEAD
+=======
+  "homepage": "https://github.com/juliotorresmoreno/proxy-logger",
+>>>>>>> feature/admin
   "authors": [
     "Julio Torres <jtorres990@gmail.com>"
   ],
@@ -16,8 +20,9 @@
   ],
   "dependencies": {
     "bootstrap": "^4.5.3",
+    "moment": "^2.29.1",
     "vue": "^2.6.12",
     "jquery": "^3.5.1",
-    "moment": "^2.29.1"
+    "vue-router": "^3.4.9"
   }
 }

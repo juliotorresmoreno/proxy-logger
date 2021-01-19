@@ -7,7 +7,9 @@ import (
 	"os"
 
 	"github.com/juliotorresmoreno/proxy-logger/config"
-	"github.com/juliotorresmoreno/proxy-logger/routes/proxy"
+	"github.com/juliotorresmoreno/proxy-logger/routes/proxyroutes"
+	"github.com/juliotorresmoreno/proxy-logger/services/adminservice"
+	"github.com/juliotorresmoreno/proxy-logger/services/loggerservice"
 )
 
 func main() {
@@ -25,11 +27,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	proxy.SetLoggerWriter(os.Stdout)
+	loggerservice.SetLoggerWriter(os.Stdout)
 	server := &http.Server{
 		Addr:    config.Addr,
-		Handler: proxy.NewRouter(),
+		Handler: proxyroutes.NewRouter(),
 	}
+	adminServer := adminservice.NewServer()
+	go adminServer.ListenAndServe()
 	if proto == "http" {
 		log.Fatal(server.ListenAndServe())
 	} else {
