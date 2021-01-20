@@ -31,18 +31,29 @@ func (f neuteredReaddirFile) Readdir(count int) ([]os.FileInfo, error) {
 // NewRouter .
 func NewRouter() http.Handler {
 	router := mux.NewRouter()
-	helpers.HandleStripPrefix(router, "/api/users", newUsersRouter())
 
-	staticFiles := http.FileServer((onlyFiles{http.Dir("./bower_components")}))
+	attachAPI(router)
+	attachFiles(router)
+
+	return router
+}
+
+func attachAPI(router *mux.Router) {
+	api := mux.NewRouter()
+	helpers.HandleStripPrefix(router, "/api", api)
+
+	helpers.HandleStripPrefix(api, "/users", newUsersRouter())
+}
+
+func attachFiles(router *mux.Router) {
+	staticFiles := http.FileServer(onlyFiles{http.Dir("./bower_components")})
 	helpers.HandleStripPrefix(router, "/static", staticFiles).Methods("GET")
 
 	jsFiles := http.FileServer(onlyFiles{http.Dir("./public/js")})
 	helpers.HandleStripPrefix(router, "/js", jsFiles).Methods("GET")
 
-	cssFiles := http.FileServer((onlyFiles{http.Dir("./public/css")}))
+	cssFiles := http.FileServer(onlyFiles{http.Dir("./public/css")})
 	helpers.HandleStripPrefix(router, "/css", cssFiles).Methods("GET")
 
 	router.PathPrefix("/").HandlerFunc(indexFile).Methods("GET")
-
-	return router
 }

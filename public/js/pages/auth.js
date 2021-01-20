@@ -9,8 +9,8 @@
      * @param {import('./auth').Credentials} data 
      */
     function validateSignIn(data) {
-        if (!data.username) throw new UsernameNotFound();
-        if (!data.password) throw new PasswordNotFound();
+        if (!data.username) throw new ErrorUsernameNotFound();
+        if (!data.password) throw new ErrorPasswordNotFound();
     }
 
     /** 
@@ -26,7 +26,7 @@
             },
             body: JSON.stringify(credentials)
         });
-        if (!response.ok) throw new Unauthorized();
+        if (!response.ok) throw new ErrorUnauthorized();
         return response.json();
     }
 

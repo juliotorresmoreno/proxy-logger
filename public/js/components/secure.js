@@ -7,9 +7,6 @@
             }
             return createElement('Layout');
         },
-        mounted() {
-            attachLinks(this.$el);
-        },
         updated() {
             attachLinks(this.$el);
         }
