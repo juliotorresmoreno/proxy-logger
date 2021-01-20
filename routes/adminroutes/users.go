@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/juliotorresmoreno/proxy-logger/helpers"
 	"github.com/juliotorresmoreno/proxy-logger/services/authservice"
@@ -40,7 +38,7 @@ func usersSignIn(w http.ResponseWriter, r *http.Request) {
 	if helpers.HandleHTTPError(w, r, err, 401) {
 		return
 	}
-	jwtToken, err := createJwtToken(u.Username)
+	jwtToken, err := helpers.CreateJwtToken(u.Username)
 	if helpers.HandleHTTPError(w, r, err, 500) {
 		return
 	}
@@ -62,16 +60,4 @@ type usersSignUpBody struct {
 func usersSignUp(w http.ResponseWriter, r *http.Request) {
 	err := errors.New("Not implemnted")
 	helpers.HandleHTTPError(w, r, err, 400)
-}
-
-func createJwtToken(username string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": username,
-		"nbf":      time.Now().Unix(),
-	})
-	hmacSampleSecret := ""
-
-	tokenString, err := token.SignedString(hmacSampleSecret)
-
-	return tokenString, err
 }
