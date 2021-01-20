@@ -42,7 +42,7 @@ func HandleHTTPError(w http.ResponseWriter, r *http.Request, err error, status i
 func CreateJwtToken(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
-		"nbf":      time.Now().Unix(),
+		"nbf":      time.Now().Add(time.Hour * 2).Unix(),
 	})
 	config, err := config.GetConfig()
 	if err != nil {
@@ -64,12 +64,9 @@ func ValidateJwtToken(jwtToken string) (string, error) {
 	hmacSampleSecret := config.Admin.Secret
 
 	token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 		return hmacSampleSecret, nil
 	})
 	if err != nil {

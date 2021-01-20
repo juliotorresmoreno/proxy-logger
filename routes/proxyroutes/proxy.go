@@ -3,12 +3,35 @@ package proxyroutes
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/juliotorresmoreno/proxy-logger/services/authservice"
 	"github.com/juliotorresmoreno/proxy-logger/services/loggerservice"
 )
+
+const authenticationRequiredHTML = `
+<!DOCTYPE HTML "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>407 Proxy Authentication Required</title>
+</head><body>
+<h1>Proxy Authentication Required</h1>
+<p>This server could not verify that you
+are authorized to access the document
+requested.  Either you supplied the wrong
+credentials (e.g., bad password), or your
+browser doesn't understand how to supply
+the credentials required.</p>
+</body></html>
+`
+
+func AuthRequired(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Proxy-Authenticate", "Basic realm=\"Proxy Logger\"")
+	w.Header().Add("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(407)
+	fmt.Fprintf(w, authenticationRequiredHTML)
+}
 
 // BasicAuth .
 func BasicAuth(credentials string) error {
@@ -39,13 +62,11 @@ func NewRouter() http.HandlerFunc {
 		if len(credentials) > 6 && credentials[:5] == "Basic" {
 			credentials = credentials[6:]
 			if BasicAuth(credentials) != nil {
-				w.WriteHeader(401)
-				w.Write([]byte("Unauthorized"))
+				AuthRequired(w, r)
 				return
 			}
 		} else {
-			w.WriteHeader(401)
-			w.Write([]byte("Unauthorized"))
+			AuthRequired(w, r)
 			return
 		}
 		httpWriter := loggerservice.NewHTTPWriter(w, r)
@@ -55,7 +76,7 @@ func NewRouter() http.HandlerFunc {
 			httpWriter.Register()
 		} else {
 			handleHTTP(httpWriter, r)
-			httpWriter.Protocol = "http"
+			httpWriter.Protocol = strings.Split(r.RequestURI, ":")[0]
 			httpWriter.Register()
 		}
 	}

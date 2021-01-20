@@ -1,6 +1,7 @@
 package adminservice
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/NYTimes/gziphandler"
@@ -25,4 +26,23 @@ func NewServer() *Server {
 		Handler: router,
 	}
 	return s
+}
+
+func (s *Server) Listen() {
+	config, err := config.GetConfig()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if config.Admin.Enabled != "true" {
+		return
+	}
+	if config.Admin.Proto == "https" {
+		err = s.Server.ListenAndServeTLS(config.PemPath, config.KeyPath)
+	} else {
+		err = s.Server.ListenAndServe()
+	}
+	if err != nil {
+		log.Println("Admin error:", err)
+	}
 }

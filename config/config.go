@@ -15,14 +15,21 @@ type Credentials struct {
 
 // Admin .
 type Admin struct {
-	Addr   string `yaml:"addr"`
-	Secret string `yaml:"secret"`
+	Enabled string `yaml:"enabled"`
+	Proto   string `yaml:"proto"`
+	Addr    string `yaml:"addr"`
+	Secret  string `yaml:"secret"`
+	PemPath string `yaml:"pem_path"`
+	KeyPath string `yaml:"key_path"`
 }
 
 // Config .
 type Config struct {
 	Addr        string        `yaml:"addr"`
 	RedisURL    string        `yaml:"redis_url"`
+	PemPath     string        `yaml:"pem_path"`
+	KeyPath     string        `yaml:"key_path"`
+	Proto       string        `yaml:"proto"`
 	Credentials []Credentials `yaml:"credentials"`
 	Admin       Admin         `yaml:"admin"`
 	credentials map[string]Credentials
