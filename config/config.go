@@ -52,8 +52,6 @@ var config interface{}
 func GetConfig() (Config, error) {
 	if config == nil {
 		result := Config{}
-		//_, filename, _, _ := runtime.Caller(1)
-		//f, err := os.Open(path.Join(path.Dir(filename), "config.yml"))
 		f, err := os.Open("config.yml")
 		if err != nil {
 			return result, err
