@@ -6,7 +6,8 @@ import (
 	"time"
 )
 
-func handleTunneling(w http.ResponseWriter, r *http.Request) {
+func handleTunneling(w http.ResponseWriter, r *reverseRequest) {
+	// fmt.Println(r.Host)
 	destConn, err := net.DialTimeout("tcp", r.Host, 10*time.Second)
 	vDestConn := &conn{destConn}
 	if err != nil {

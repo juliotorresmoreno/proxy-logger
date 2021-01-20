@@ -26,15 +26,15 @@ the credentials required.</p>
 </body></html>
 `
 
-func AuthRequired(w http.ResponseWriter, r *http.Request) {
+func authRequired(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Proxy-Authenticate", "Basic realm=\"Proxy Logger\"")
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(407)
 	fmt.Fprintf(w, authenticationRequiredHTML)
 }
 
-// BasicAuth .
-func BasicAuth(credentials string) error {
+// basicAuth .
+func basicAuth(credentials string) error {
 	decoded, err := base64.StdEncoding.DecodeString(credentials)
 	if err != nil {
 		return errors.New("Unauthorized")
@@ -61,22 +61,32 @@ func NewRouter() http.HandlerFunc {
 		}
 		if len(credentials) > 6 && credentials[:5] == "Basic" {
 			credentials = credentials[6:]
-			if BasicAuth(credentials) != nil {
-				AuthRequired(w, r)
+			if basicAuth(credentials) != nil {
+				authRequired(w, r)
 				return
 			}
 		} else {
-			AuthRequired(w, r)
+			authRequired(w, r)
 			return
 		}
+		requestURI := r.RequestURI
+		httpRequest := reverseURI(r)
 		httpWriter := loggerservice.NewHTTPWriter(w, r)
+		if !isSecure(r.Host) {
+			w.WriteHeader(401)
+			fmt.Fprintf(httpWriter, "Unauthorized")
+			return
+		}
+		if r.Method != http.MethodConnect && !strings.Contains(r.Host, ":") {
+			r.Host = r.Host + ":80"
+		}
 		if r.Method == http.MethodConnect {
-			handleTunneling(w, r)
+			handleTunneling(w, httpRequest)
 			httpWriter.Protocol = "https"
 			httpWriter.Register()
 		} else {
-			handleHTTP(httpWriter, r)
-			httpWriter.Protocol = strings.Split(r.RequestURI, ":")[0]
+			handleHTTP(httpWriter, httpRequest)
+			httpWriter.Protocol = strings.Split(requestURI, ":")[0]
 			httpWriter.Register()
 		}
 	}

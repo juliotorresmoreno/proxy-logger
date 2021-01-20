@@ -5,8 +5,12 @@ import (
 	"net/http"
 )
 
-func handleHTTP(w http.ResponseWriter, req *http.Request) {
-	resp, err := http.DefaultTransport.RoundTrip(req)
+func handleHTTP(w http.ResponseWriter, req *reverseRequest) {
+	request := *req.Request
+	request.URL.Host = req.reverseHOST
+	request.Header.Del("Proxy-Authorization")
+	request.Header.Del("Proxy-Connection")
+	resp, err := http.DefaultTransport.RoundTrip(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
 		return
