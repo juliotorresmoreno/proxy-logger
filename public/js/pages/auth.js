@@ -17,13 +17,14 @@
      * @param {Credentials} data
      * @returns {Promise<Session>}
      */
-    async function signIn(data) {
+    async function signIn(credentials) {
         validateSignIn(credentials);
-        const response = fetch('/api/users/sign-in', {
+        const response = await fetch('/api/users/sign-in', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data);
+            body: JSON.stringify(credentials)
         });
         if (!response.ok) throw new Unauthorized();
         return response.json();
@@ -39,7 +40,7 @@
                 const { username, password } = this;
                 const credentials = { username, password };
                 const session = await signIn(credentials);
-                appStore.setState(session);
+                appStore.setState({ session: session });
             }
         },
         template: `

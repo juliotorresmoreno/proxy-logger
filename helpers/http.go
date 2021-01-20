@@ -48,7 +48,7 @@ func CreateJwtToken(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	hmacSampleSecret := config.Admin.Secret
+	hmacSampleSecret := []byte(config.Admin.Secret)
 
 	tokenString, err := token.SignedString(hmacSampleSecret)
 
