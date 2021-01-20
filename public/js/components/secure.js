@@ -6,6 +6,9 @@
                 return createElement('Auth');
             }
             return createElement('Layout');
+        },
+        updated() {
+            attachLinks(this.$el);
         }
     });
 })();

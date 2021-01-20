@@ -45,7 +45,8 @@ func usersSignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(200)
 	err = json.NewEncoder(w).Encode(map[string]string{
-		"jwtToken": jwtToken,
+		"token":    jwtToken,
+		"username": u.Username,
 	})
 	if helpers.HandleHTTPError(w, r, err, 500) {
 		return
