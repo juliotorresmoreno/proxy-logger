@@ -2,6 +2,8 @@ package helpers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -51,4 +53,31 @@ func CreateJwtToken(username string) (string, error) {
 	tokenString, err := token.SignedString(hmacSampleSecret)
 
 	return tokenString, err
+}
+
+// ValidateJwtToken .
+func ValidateJwtToken(jwtToken string) (string, error) {
+	config, err := config.GetConfig()
+	if err != nil {
+		return "", err
+	}
+	hmacSampleSecret := config.Admin.Secret
+
+	token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		return hmacSampleSecret, nil
+	})
+	if err != nil {
+		return "", err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return "", errors.New("Unauthorized")
+	}
+	return claims["username"].(string), nil
 }
