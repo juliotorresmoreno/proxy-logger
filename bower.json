@@ -1,16 +1,12 @@
 {
   "name": "proxy-logger",
-<<<<<<< HEAD
-=======
   "homepage": "https://github.com/juliotorresmoreno/proxy-logger",
->>>>>>> feature/admin
   "authors": [
     "Julio Torres <jtorres990@gmail.com>"
   ],
   "description": "",
   "main": "",
   "license": "MIT",
-  "homepage": "https://",
   "ignore": [
     "**/.*",
     "node_modules",

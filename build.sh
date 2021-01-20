@@ -1,0 +1,8 @@
+#!/bin/sh
+
+mkdir -p bin
+GOOS=windows GOARCH=amd64 go build
+mv proxy-logger.exe bin
+
+GOOS=linux GOARCH=amd64 go build
+mv proxy-logger bin

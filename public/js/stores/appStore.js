@@ -11,9 +11,7 @@ const appStore = {
         route: '/',
         session: {
             token: '',
-            profile: {
-                username: ''
-            }
+            username: ''
         }
     },
     setState(data) {

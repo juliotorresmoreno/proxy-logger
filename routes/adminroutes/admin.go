@@ -5,13 +5,14 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/juliotorresmoreno/proxy-logger/helpers"
 )
 
-type justFilesFilesystem struct {
+type onlyFiles struct {
 	fs http.FileSystem
 }
 
-func (el justFilesFilesystem) Open(name string) (http.File, error) {
+func (el onlyFiles) Open(name string) (http.File, error) {
 	f, err := el.fs.Open(name)
 	if err != nil {
 		return nil, err
@@ -30,21 +31,18 @@ func (f neuteredReaddirFile) Readdir(count int) ([]os.FileInfo, error) {
 // NewRouter .
 func NewRouter() http.Handler {
 	router := mux.NewRouter()
+	helpers.HandleStripPrefix(router, "/api/users", newUsersRouter())
 
-	staticFiles := justFilesFilesystem{http.Dir("./bower_components")}
-	router.PathPrefix("/static").
-		Handler(http.StripPrefix("/static", http.FileServer(staticFiles))).
-		Methods("GET")
-	jsFiles := justFilesFilesystem{http.Dir("./public/js")}
-	router.PathPrefix("/js").
-		Handler(http.StripPrefix("/js", http.FileServer(jsFiles))).
-		Methods("GET")
-	cssFiles := justFilesFilesystem{http.Dir("./public/css")}
-	router.PathPrefix("/css").
-		Handler(http.StripPrefix("/css", http.FileServer(cssFiles))).
-		Methods("GET")
-	router.PathPrefix("/").
-		HandlerFunc(indexFile).
-		Methods("GET")
+	staticFiles := http.FileServer((onlyFiles{http.Dir("./bower_components")}))
+	helpers.HandleStripPrefix(router, "/static", staticFiles).Methods("GET")
+
+	jsFiles := http.FileServer(onlyFiles{http.Dir("./public/js")})
+	helpers.HandleStripPrefix(router, "/js", jsFiles).Methods("GET")
+
+	cssFiles := http.FileServer((onlyFiles{http.Dir("./public/css")}))
+	helpers.HandleStripPrefix(router, "/css", cssFiles).Methods("GET")
+
+	router.PathPrefix("/").HandlerFunc(indexFile).Methods("GET")
+
 	return router
 }

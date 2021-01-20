@@ -3,8 +3,6 @@ package config
 import (
 	"io/ioutil"
 	"os"
-	"path"
-	"runtime"
 
 	"gopkg.in/yaml.v2"
 )
@@ -17,7 +15,8 @@ type Credentials struct {
 
 // Admin .
 type Admin struct {
-	Addr string `yaml:"addr"`
+	Addr   string `yaml:"addr"`
+	Secret string `yaml:"secret"`
 }
 
 // Config .
@@ -53,8 +52,9 @@ var config interface{}
 func GetConfig() (Config, error) {
 	if config == nil {
 		result := Config{}
-		_, filename, _, _ := runtime.Caller(1)
-		f, err := os.Open(path.Join(path.Dir(filename), "config.yml"))
+		//_, filename, _, _ := runtime.Caller(1)
+		//f, err := os.Open(path.Join(path.Dir(filename), "config.yml"))
+		f, err := os.Open("config.yml")
 		if err != nil {
 			return result, err
 		}

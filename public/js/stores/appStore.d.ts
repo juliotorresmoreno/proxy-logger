@@ -1,10 +1,6 @@
 
-interface Session {
-    token: string;
-    profile: {
-        username: string;
-    }
-}
+import { Session } from '../models/session'
+
 
 export interface AppData {
     route: string;

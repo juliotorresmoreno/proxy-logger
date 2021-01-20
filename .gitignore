@@ -4,3 +4,6 @@ test
 tests
 requests.json
 config.yml
+*.exe
+proxy-logger
+bin
