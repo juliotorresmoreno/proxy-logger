@@ -85,7 +85,7 @@ func NewRouter() http.HandlerFunc {
 			httpWriter.Protocol = "https"
 			httpWriter.Register()
 		} else {
-			handleHTTP(httpWriter, httpRequest)
+			handleHTTP(w, httpRequest)
 			httpWriter.Protocol = strings.Split(requestURI, ":")[0]
 			httpWriter.Register()
 		}
