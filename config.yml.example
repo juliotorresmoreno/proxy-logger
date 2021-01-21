@@ -1,0 +1,22 @@
+addr: :5000
+redis_url: redis://127.0.0.1:6379/0
+proto: http
+pem_path: server.pem
+key_path: server.key
+admin:
+  enabled: false
+  addr: 127.0.0.1:8080
+  secret: 
+  pem_path: server.pem
+  key_path: server.key
+  proto: https
+credentials:
+- username: proxy-logger
+  password: 8a5b80f84d5411ffeb7d57dcbbbca63decedf908b05120a3571441bf43122b77
+ACL:
+  default: permit
+  permit:
+  block:
+reverse:
+- host: adminproxy
+  forward: 127.0.0.1:8080
