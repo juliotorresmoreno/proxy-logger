@@ -1,8 +1,12 @@
 package config
 
 import (
+	"flag"
 	"io/ioutil"
+	"log"
 	"os"
+	"path"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -115,12 +119,26 @@ func (c *Config) MapReverse() {
 }
 
 var config interface{}
+var configPath string = ""
+
+func getConfigArgs() {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	configPathDefault := path.Join(dir, "config.yml")
+	flag.StringVar(&configPath, "c", configPathDefault, "Archivo de configuracion")
+	flag.Parse()
+}
 
 // GetConfig .
 func GetConfig() (Config, error) {
 	if config == nil {
+		if configPath == "" {
+			getConfigArgs()
+		}
 		result := Config{}
-		f, err := os.Open("config.yml")
+		f, err := os.Open(configPath)
 		if err != nil {
 			return result, err
 		}

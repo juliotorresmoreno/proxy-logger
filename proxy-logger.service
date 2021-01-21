@@ -1,0 +1,33 @@
+[Unit]
+Description=Advanced Proxy Logger
+After=network.target
+Documentation=https://github.com/juliotorresmoreno/proxy-logger/blob/master/README.md
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/proxy-logger -c /etc/proxy-logger/config.yml
+PIDFile=/run/redis/proxy-logger.pid
+TimeoutStopSec=0
+Restart=always
+User=proxy-logger
+Group=nogroup
+
+UMask=007
+ReadOnlyDirectories=/
+ReadWritePaths=-/var/log/proxy-logger
+ReadWritePaths=-/var/run/proxy-logger
+
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE
+MemoryDenyWriteExecute=true
+ProtectKernelModules=false
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ProtectSystem=true
+
+[Install]
+WantedBy=multi-user.target
+Alias=proxy-logger.service

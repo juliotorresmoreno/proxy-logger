@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/juliotorresmoreno/proxy-logger/config"
 	"github.com/juliotorresmoreno/proxy-logger/services/authservice"
 	"github.com/juliotorresmoreno/proxy-logger/services/loggerservice"
 )
@@ -59,26 +60,29 @@ func NewRouter() http.HandlerFunc {
 		if len(credentials) < 6 {
 			credentials = r.Header.Get("Proxy-Authorization")
 		}
-		if len(credentials) > 6 && credentials[:5] == "Basic" {
-			credentials = credentials[6:]
-			if basicAuth(credentials) != nil {
+		config, _ := config.GetConfig()
+		if len(config.Credentials) > 0 {
+			if len(credentials) > 6 && credentials[:5] == "Basic" {
+				credentials = credentials[6:]
+				if basicAuth(credentials) != nil {
+					authRequired(w, r)
+					return
+				}
+			} else {
 				authRequired(w, r)
 				return
 			}
-		} else {
-			authRequired(w, r)
-			return
 		}
 		requestURI := r.RequestURI
 		httpRequest := reverseURI(r)
 		httpWriter := loggerservice.NewHTTPWriter(w, r)
+		if r.Method != http.MethodConnect && !strings.Contains(r.Host, ":") {
+			r.Host = r.Host + ":80"
+		}
 		if !isSecure(r.Host) {
 			w.WriteHeader(401)
 			fmt.Fprintf(httpWriter, "Unauthorized")
 			return
-		}
-		if r.Method != http.MethodConnect && !strings.Contains(r.Host, ":") {
-			r.Host = r.Host + ":80"
 		}
 		if r.Method == http.MethodConnect {
 			handleTunneling(w, httpRequest)
